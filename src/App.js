@@ -1,26 +1,30 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { Component } from 'react';
 import './App.css';
+import { Container, Button, Alert } from 'react-bootstrap';
+import TaskList from './Task/TaskList';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isAddProduct: false,
+      error: null,
+      response: {},
+      product: {},
+      isEditProduct: false
+    }
+  }
+
+  render() {
+    return (
+      <div className="App">
+        <Container>
+          <h1 style={{textAlign:'center'}}>React Tutorial</h1>
+            <TaskList></TaskList>
+        </Container>
+      </div>
+    );
+  }
 }
 
 export default App;
