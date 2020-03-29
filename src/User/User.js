@@ -1,33 +1,33 @@
 import React from 'react';
-import { Button, Alert } from 'react-bootstrap';
-import TaskList from './TaskList';
-import TaskAdd from './TaskAdd';
+import UserList from './UserList';
+import UserAdd from './UserAdd';
+import { Alert, Button } from 'react-bootstrap';
 
-class Task extends React.Component {
+class User extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            error: null,
-            task: {},
-            tasks: [],
+            users: [],
             response: {},
-            isAddTask: false,
-            isEditTask: false
+            error: null,
+            isAddUser: false,
+            isEditUser: false,
+            user: {}
         }
 
-        this.deleteTask = this.deleteTask.bind(this);
-        this.editTask = this.editTask.bind(this);
+        this.deleteUser = this.deleteUser.bind(this);
+        this.editUser = this.editUser.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
     }
 
     componentDidMount() {
-        const api_url = 'http://localhost:3001/api/tasks';
+        const api_url = 'http://localhost:3001/api/users';
         fetch(api_url)
             .then(res => res.json())
             .then(
                 (result) => {
                     this.setState({
-                        tasks: result
+                        users: result
                     })
                 },
                 (error) => {
@@ -37,20 +37,20 @@ class Task extends React.Component {
     }
 
     onCreate() {
-        this.setState({ isAddTask: true });
+        this.setState({ isAddUser: true });
     }
 
     onSubmit(data) {
         let api_url;
         let method;
 
-        if(this.state.isEditTask) {
-            api_url = 'http://localhost:3001/api/tasks/:id';
+        if(this.state.isEditUser) {
+            api_url = 'http://localhost:3001/api/users/:id';
             api_url = api_url.replace(':id', data.id);
             method = 'PUT';
         }
         else {
-            api_url = 'http://localhost:3001/api/tasks';
+            api_url = 'http://localhost:3001/api/users';
             method = 'POST';
         }
 
@@ -64,24 +64,23 @@ class Task extends React.Component {
         };
 
         fetch(api_url, options)
-            .then(res => res.text())
+            .then(res => res.json())
             .then(
                 (result) => {
                     this.setState({
-                        response: JSON.parse(result),
-                        isAddTask: false,
-                        isEditTask: false,
+                        response: result,
+                        isAddUser: false,
+                        isEditUser: false,
                     });
                     if(this.state.response.status === "success") {
-                        api_url = 'http://localhost:3001/api/tasks';
-                        method = 'GET';
+                        api_url = 'http://localhost:3001/api/users';
             
                         fetch(api_url)
                             .then(res => res.json())
                             .then(
                                 (result) => {
                                     this.setState({
-                                        tasks: result
+                                        users: result
                                     })
                                 },
                                 (error) => {
@@ -97,22 +96,22 @@ class Task extends React.Component {
             
     }
 
-    deleteTask(taskId) {
-        const { tasks } = this.state;
-        var api_url = 'http://localhost:3001/api/tasks/:id';
-        api_url = api_url.replace(':id', taskId);
+    deleteUser(userId) {
+        const { users } = this.state;
+        let api_url = 'http://localhost:3001/api/users/:id';
+        api_url = api_url.replace(':id', userId);
 
         const options = {
-            method: 'DELETE',
+            method: 'DELETE'
         }
-
+        
         fetch(api_url, options)
-            .then(res => res.text())
+            .then((res) => res.json())
             .then(
                 (result) => {
                     this.setState({
-                        response: JSON.parse(result),
-                        tasks: tasks.filter(task => task.id !== taskId)
+                        response: result,
+                        users: users.filter(user => user.id !== userId)
                     });
                 },
                 (error) => {
@@ -121,9 +120,9 @@ class Task extends React.Component {
             )
     }
 
-    editTask(taskId) {
-        var api_url = 'http://localhost:3001/api/tasks/:id';
-        api_url = api_url.replace(':id', taskId);
+    editUser(userId) {
+        var api_url = 'http://localhost:3001/api/users/:id';
+        api_url = api_url.replace(':id', userId);
 
         const options = {
             method: 'GET'
@@ -134,9 +133,9 @@ class Task extends React.Component {
             .then(
                 (result) => {
                     this.setState({
-                        task: result,
-                        isAddTask: true,
-                        isEditTask: true
+                        user: result,
+                        isAddUser: true,
+                        isEditUser: true
                     });
                 },
                 (error) => {
@@ -146,10 +145,11 @@ class Task extends React.Component {
     }
 
     render() {
-        const { error, tasks, task} = this.state;
-        let taskForm;
-        if(this.state.isAddTask || this.state.isEditTask) {
-            taskForm = <TaskAdd onSubmit={this.onSubmit} task={task}></TaskAdd>
+        const { error, users, user} = this.state;
+
+        let userForm;
+        if(this.state.isAddUser || this.state.isEditUser) {
+            userForm = <UserAdd onSubmit={this.onSubmit} user={user}></UserAdd>
         }
 
         if(error) {
@@ -160,10 +160,10 @@ class Task extends React.Component {
         else {
             return (
                 <div>
-                    {!this.state.isAddTask && <Button variant="primary" onClick={() => this.onCreate()}>Add Task</Button>}
+                    {!this.state.isAddUser && <Button variant="primary" onClick={() => this.onCreate()}>Add User</Button>}
                     {this.state.response.status === 'success' && <div><br /><Alert variant="info">{this.state.response.message}</Alert></div>}
-                    {!this.state.isAddTask && <TaskList tasks={tasks} deleteTask={this.deleteTask} editTask={this.editTask}></TaskList>}
-                    { taskForm }
+                    {!this.state.isAddUser && <UserList users={users} deleteUser={this.deleteUser} editUser={this.editUser}></UserList>}
+                    { userForm }
                     {error && <div>Error: {error.message}</div>}
                 </div>
             )
@@ -171,4 +171,4 @@ class Task extends React.Component {
     }
 }
 
-export default Task;
+export default User;
